@@ -1,0 +1,103 @@
+[
+    {
+      "name": "Shadow Step",
+      "description": "Move swiftly through shadows, avoiding detection.",
+      "level": 1
+    },
+    {
+      "name": "Healing Light",
+      "description": "Restore a moderate amount of health over time.",
+      "level": 2
+    },
+    {
+      "name": "Mana Burst",
+      "description": "Release a burst of energy to damage nearby enemies.",
+      "level": 3
+    },
+    {
+      "name": "Blade Dance",
+      "description": "Perform a flurry of sword strikes in a wide arc.",
+      "level": 4
+    },
+    {
+      "name": "Summon Familiar",
+      "description": "Call forth a spirit to aid you in battle temporarily.",
+      "level": 2
+    },
+    {
+      "name": "Flame Pillar",
+      "description": "Summon a pillar of fire at a target location.",
+      "level": 3
+    },
+    {
+      "name": "Lightning Strike",
+      "description": "Call down a bolt of lightning to smite your foes.",
+      "level": 5
+    },
+    {
+      "name": "Arcane Shield",
+      "description": "Create a magical barrier to absorb incoming damage.",
+      "level": 2
+    },
+    {
+      "name": "Ice Prison",
+      "description": "Trap an enemy in a block of ice, immobilizing them.",
+      "level": 3
+    },
+    {
+      "name": "Teleportation",
+      "description": "Instantly transport to a location within a short range.",
+      "level": 4
+    },
+    {
+      "name": "Poison Cloud",
+      "description": "Release a toxic cloud that damages enemies over time.",
+      "level": 3
+    },
+    {
+      "name": "Berserker Rage",
+      "description": "Temporarily increase strength and attack speed.",
+      "level": 4
+    },
+    {
+      "name": "Wind Blade",
+      "description": "Unleash a sharp blade of wind to cut through enemies.",
+      "level": 2
+    },
+    {
+      "name": "Earthquake",
+      "description": "Cause the ground to shake, dealing damage in a wide area.",
+      "level": 5
+    },
+    {
+      "name": "Silent Assassin",
+      "description": "Increase critical hit chance when attacking from stealth.",
+      "level": 2
+    },
+    {
+      "name": "Divine Blessing",
+      "description": "Grant temporary invulnerability to a single ally.",
+      "level": 5
+    },
+    {
+      "name": "Water Barrier",
+      "description": "Summon a wall of water to block enemy attacks.",
+      "level": 3
+    },
+    {
+      "name": "Piercing Arrow",
+      "description": "Fire an arrow that pierces through multiple enemies.",
+      "level": 2
+    },
+    {
+      "name": "Dark Pact",
+      "description": "Sacrifice health to gain a surge of mana.",
+      "level": 4
+    },
+    {
+      "name": "Phoenix Rebirth",
+      "description": "Revive with full health after being defeated once.",
+      "level": 5
+    }
+  ]
+  

@@ -1,0 +1,148 @@
+[
+    {
+      "title": "Morning Workout",
+      "description": "Complete 100 push-ups, 100 sit-ups, and 10km running.",
+      "priority": 1
+    },
+    {
+      "title": "Prepare the Field",
+      "description": "Spend an hour plowing and watering the farmland.",
+      "priority": 1
+    },
+    {
+      "title": "Gather Firewood",
+      "description": "Collect 30 logs of firewood from the nearby forest.",
+      "priority": 1
+    },
+    {
+      "title": "Cook a Nutritious Meal",
+      "description": "Prepare a healthy meal with the available ingredients.",
+      "priority": 1
+    },
+    {
+      "title": "Meditation Practice",
+      "description": "Spend 20 minutes practicing focused meditation.",
+      "priority": 1
+    },
+    {
+      "title": "Wolf Hunt",
+      "description": "Eliminate the alpha wolf terrorizing the village.",
+      "priority": 3
+    },
+    {
+      "title": "Cave Exploration",
+      "description": "Investigate the mysterious cave near the mountain.",
+      "priority": 4
+    },
+    {
+      "title": "Escort the Merchant",
+      "description": "Protect the merchant caravan on their journey to the city.",
+      "priority": 3
+    },
+    {
+      "title": "Defeat the Goblin King",
+      "description": "Confront and eliminate the Goblin King deep within the forest.",
+      "priority": 5
+    },
+    {
+      "title": "Harvest Mana Crystals",
+      "description": "Mine 20 mana crystals from the dangerous cave.",
+      "priority": 4
+    },
+    {
+      "title": "Protect the Village",
+      "description": "Defend the village against a surprise monster attack.",
+      "priority": 5
+    },
+    {
+      "title": "Fishing Challenge",
+      "description": "Catch a rare golden fish from the river.",
+      "priority": 2
+    },
+    {
+      "title": "Repair the Bridge",
+      "description": "Fix the broken wooden bridge across the river.",
+      "priority": 3
+    },
+    {
+      "title": "Destroy the Bandit Camp",
+      "description": "Locate and eliminate the bandit group threatening travelers.",
+      "priority": 4
+    },
+    {
+      "title": "Recover the Lost Artifact",
+      "description": "Find and return the ancient artifact stolen by thieves.",
+      "priority": 4
+    },
+    {
+      "title": "Slay the Cave Troll",
+      "description": "Defeat the troll that has taken over the mountain pass.",
+      "priority": 5
+    },
+    {
+      "title": "Gather Magical Herbs",
+      "description": "Find and collect 10 rare magical herbs from the enchanted forest.",
+      "priority": 3
+    },
+    {
+      "title": "Train the New Recruits",
+      "description": "Teach basic combat skills to the village guards.",
+      "priority": 2
+    },
+    {
+      "title": "Investigate the Ruins",
+      "description": "Search the ancient ruins for clues about its origin.",
+      "priority": 4
+    },
+    {
+      "title": "Defend the Outpost",
+      "description": "Protect the outpost from waves of enemy attacks.",
+      "priority": 5
+    },
+    {
+      "title": "Forge a Steel Sword",
+      "description": "Assist the blacksmith in creating a high-quality steel sword.",
+      "priority": 3
+    },
+    {
+      "title": "Hunt the Forest Stalker",
+      "description": "Track and eliminate the elusive predator in the woods.",
+      "priority": 4
+    },
+    {
+      "title": "Rescue the Captives",
+      "description": "Free the villagers taken hostage by the bandits.",
+      "priority": 5
+    },
+    {
+      "title": "Deliver Urgent Supplies",
+      "description": "Transport a critical shipment of supplies to the neighboring town.",
+      "priority": 3
+    },
+    {
+      "title": "Test Your Strength",
+      "description": "Defeat the champion in a one-on-one arena battle.",
+      "priority": 4
+    },
+    {
+      "title": "Clear the Haunted Woods",
+      "description": "Destroy the cursed spirits in the haunted woods.",
+      "priority": 5
+    },
+    {
+      "title": "Secure the Watchtower",
+      "description": "Reclaim the abandoned watchtower overrun by enemies.",
+      "priority": 4
+    },
+    {
+      "title": "Repair the Village Fence",
+      "description": "Fix the broken fence to keep monsters out of the village.",
+      "priority": 2
+    },
+    {
+      "title": "Retrieve the Ancient Scroll",
+      "description": "Locate and bring back the ancient scroll from the dungeon.",
+      "priority": 4
+    }
+  ]
+  
