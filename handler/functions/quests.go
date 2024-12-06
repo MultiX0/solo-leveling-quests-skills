@@ -10,6 +10,7 @@ import (
 	"github.com/MultiX0/solo_leveling_system/db"
 	"github.com/MultiX0/solo_leveling_system/types"
 	"github.com/MultiX0/solo_leveling_system/utils"
+	"github.com/supabase-community/postgrest-go"
 )
 
 var wg = &sync.WaitGroup{}
@@ -18,26 +19,52 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 	var quest *types.Quest
 	var err error
 	var startTime time.Time
-
 	var mu sync.Mutex
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		currentQuestsData, count, queryErr := db.SupabaseClient.From("player_quests").
+		completedQuestData, count, queryErr := db.SupabaseClient.From("player_quests").
 			Select("*", "exact", false).
 			Eq("player", id).
-			Eq("status", "0").
+			Eq("status", "1").
 			Eq("priority", "1").
+			Order("start_at", &postgrest.OrderOpts{Ascending: false}).
+			Limit(1, "").
 			Execute()
-
 		if queryErr != nil {
 			mu.Lock()
 			err = queryErr
 			mu.Unlock()
 			return
 		}
-
+		if count > 0 {
+			var completedQuest []*types.PlayerQuest
+			if unmarshalErr := json.Unmarshal(completedQuestData, &completedQuest); unmarshalErr != nil {
+				mu.Lock()
+				err = unmarshalErr
+				mu.Unlock()
+				return
+			}
+			if time.Since(completedQuest[0].StartAt) < 24*time.Hour {
+				mu.Lock()
+				quest = nil
+				startTime = time.Time{}
+				mu.Unlock()
+				return
+			}
+		}
+		currentQuestsData, count, queryErr := db.SupabaseClient.From("player_quests").
+			Select("*", "exact", false).
+			Eq("player", id).
+			Eq("status", "0").
+			Eq("priority", "1").
+			Execute()
+		if queryErr != nil {
+			mu.Lock()
+			err = queryErr
+			mu.Unlock()
+			return
+		}
 		if count == 0 {
 			newQuest, fetchErr := fetchQuest(true)
 			if fetchErr != nil {
@@ -46,7 +73,6 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 				mu.Unlock()
 				return
 			}
-
 			insertErr := insertQuestToPlayerQuests(newQuest, id)
 			if insertErr != nil {
 				mu.Lock()
@@ -54,14 +80,12 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 				mu.Unlock()
 				return
 			}
-
 			mu.Lock()
 			quest = newQuest
 			startTime = time.Now()
 			mu.Unlock()
 			return
 		}
-
 		var data []*types.PlayerQuest
 		unmarshalErr := json.Unmarshal(currentQuestsData, &data)
 		if unmarshalErr != nil {
@@ -70,7 +94,6 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 			mu.Unlock()
 			return
 		}
-
 		retrievedQuest, questErr := getQuestByID(strconv.Itoa(data[0].QuestID))
 		if questErr != nil {
 			mu.Lock()
@@ -78,15 +101,12 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 			mu.Unlock()
 			return
 		}
-
 		mu.Lock()
 		quest = retrievedQuest
 		startTime = data[0].StartAt
 		mu.Unlock()
 	}()
-
 	wg.Wait()
-
 	return quest, err, startTime
 }
 
@@ -94,24 +114,57 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 	var quests []*types.Quest
 	var err error
 	var mu sync.Mutex
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		currentQuestsData, count, queryErr := db.SupabaseClient.From("player_quests").
+		completedQuestsData, count, queryErr := db.SupabaseClient.From("player_quests").
 			Select("*", "exact", false).
 			Eq("player", id).
-			Eq("status", "0").
+			Eq("status", "1").
 			Gt("priority", "1").
+			Order("start_at", &postgrest.OrderOpts{Ascending: false}).
+			Limit(2, "").
 			Execute()
-
 		if queryErr != nil {
 			mu.Lock()
 			err = queryErr
 			mu.Unlock()
 			return
 		}
-
+		if count > 0 {
+			var completedQuests []*types.PlayerQuest
+			if unmarshalErr := json.Unmarshal(completedQuestsData, &completedQuests); unmarshalErr != nil {
+				mu.Lock()
+				err = unmarshalErr
+				mu.Unlock()
+				return
+			}
+			allRecent := true
+			for _, quest := range completedQuests {
+				if time.Since(quest.StartAt) >= 24*time.Hour {
+					allRecent = false
+					break
+				}
+			}
+			if allRecent && len(completedQuests) == 2 {
+				mu.Lock()
+				quests = []*types.Quest{}
+				mu.Unlock()
+				return
+			}
+		}
+		currentQuestsData, count, queryErr := db.SupabaseClient.From("player_quests").
+			Select("*", "exact", false).
+			Eq("player", id).
+			Eq("status", "0").
+			Gt("priority", "1").
+			Execute()
+		if queryErr != nil {
+			mu.Lock()
+			err = queryErr
+			mu.Unlock()
+			return
+		}
 		if count == 0 {
 			var tempQuests []*types.Quest
 			for len(tempQuests) < 2 {
@@ -122,7 +175,6 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 					mu.Unlock()
 					return
 				}
-
 				duplicate := false
 				for _, q := range tempQuests {
 					if quest.Title == q.Title {
@@ -130,7 +182,6 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 						break
 					}
 				}
-
 				if !duplicate {
 					tempQuests = append(tempQuests, quest)
 					insertErr := insertQuestToPlayerQuests(quest, id)
@@ -142,13 +193,11 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 					}
 				}
 			}
-
 			mu.Lock()
 			quests = tempQuests
 			mu.Unlock()
 			return
 		}
-
 		var data []*types.PlayerQuest
 		unmarshalErr := json.Unmarshal(currentQuestsData, &data)
 		if unmarshalErr != nil {
@@ -157,7 +206,6 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 			mu.Unlock()
 			return
 		}
-
 		var tempQuests []*types.Quest
 		for _, d := range data {
 			quest, questErr := getQuestByID(strconv.Itoa(d.QuestID))
@@ -169,16 +217,13 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 			}
 			tempQuests = append(tempQuests, quest)
 		}
-
 		mu.Lock()
 		quests = tempQuests
 		mu.Unlock()
 	}()
-
 	wg.Wait()
 	return quests, err
 }
-
 func getQuestByID(id string) (*types.Quest, error) {
 	data, _, err := db.SupabaseClient.From("quests").Select("*", "", false).Eq("id", id).Single().Execute()
 	if err != nil {
