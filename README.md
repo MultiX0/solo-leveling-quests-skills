@@ -108,6 +108,18 @@ constraint player_skills_skill_fkey foreign key (skill) references skills (id) o
 5. Run database migrations
 6. Start the Go server
 
+### Initializing Default Test Data
+After starting the server, you can initialize default test data by sending a request to the `/init` endpoint. This will:
+- Read and insert predefined quests from `quests.json`
+- Read and insert predefined skills from `skills.json`
+
+To initialize the test data:
+```bash
+curl http://localhost:8080/api/v1/init
+```
+
+Note: Ensure that `quests.json` and `skills.json` files are present in the project root directory before calling the `/init` endpoint.
+
 ## Environment Setup
 ### Required Software
 - Go 1.20+
