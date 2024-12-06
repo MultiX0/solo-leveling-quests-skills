@@ -61,13 +61,11 @@ func (h *QuestsHandler) FinishQuest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *QuestsHandler) FetchQuests(w http.ResponseWriter, r *http.Request) {
-
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	params := mux.Vars(r)
 	playerId := params["id"]
-
 	log.Printf("Received request for player ID: %s", playerId)
 
 	if playerId == "" {
@@ -76,24 +74,31 @@ func (h *QuestsHandler) FetchQuests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mainQuest, err, startTime := functions.GetMainQuest(playerId)
+	mainQuest, err, mainStartTime := functions.GetMainQuest(playerId)
 	if err != nil {
 		log.Println(err)
 		utils.WriteError(w, http.StatusBadGateway, err)
 		return
 	}
 
-	sideQuests, err := functions.GetSideQuests(playerId)
+	sideQuests, err, sideStartTime := functions.GetSideQuests(playerId)
 	if err != nil {
 		log.Println(err)
 		utils.WriteError(w, http.StatusBadGateway, err)
 		return
 	}
 
-	timeLeft := time.Until(startTime.Add(24 * time.Hour))
+	var timeLeft time.Duration
+	if mainQuest != nil {
+		timeLeft = time.Until(mainStartTime.Add(24 * time.Hour))
+	} else if len(sideQuests) > 0 {
+		timeLeft = time.Until(sideStartTime.Add(24 * time.Hour))
+	}
+
 	if timeLeft < 0 {
 		timeLeft = 0
 	}
+
 	timeLeftStr := timeLeft.Round(time.Minute).String()
 
 	type Response struct {

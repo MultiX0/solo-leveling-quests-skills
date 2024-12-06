@@ -110,9 +110,10 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 	return quest, err, startTime
 }
 
-func GetSideQuests(id string) ([]*types.Quest, error) {
+func GetSideQuests(id string) ([]*types.Quest, error, time.Time) {
 	var quests []*types.Quest
 	var err error
+	var startTime time.Time
 	var mu sync.Mutex
 	wg.Add(1)
 	go func() {
@@ -140,7 +141,11 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 				return
 			}
 			allRecent := true
+			earliestStart := time.Now()
 			for _, quest := range completedQuests {
+				if quest.StartAt.Before(earliestStart) {
+					earliestStart = quest.StartAt
+				}
 				if time.Since(quest.StartAt) >= 24*time.Hour {
 					allRecent = false
 					break
@@ -149,6 +154,7 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 			if allRecent && len(completedQuests) == 2 {
 				mu.Lock()
 				quests = []*types.Quest{}
+				startTime = earliestStart
 				mu.Unlock()
 				return
 			}
@@ -167,6 +173,7 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 		}
 		if count == 0 {
 			var tempQuests []*types.Quest
+			currentTime := time.Now()
 			for len(tempQuests) < 2 {
 				quest, fetchErr := fetchQuest(false)
 				if fetchErr != nil {
@@ -195,6 +202,7 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 			}
 			mu.Lock()
 			quests = tempQuests
+			startTime = currentTime
 			mu.Unlock()
 			return
 		}
@@ -207,6 +215,7 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 			return
 		}
 		var tempQuests []*types.Quest
+		earliestStart := time.Now()
 		for _, d := range data {
 			quest, questErr := getQuestByID(strconv.Itoa(d.QuestID))
 			if questErr != nil {
@@ -215,15 +224,20 @@ func GetSideQuests(id string) ([]*types.Quest, error) {
 				mu.Unlock()
 				return
 			}
+			if d.StartAt.Before(earliestStart) {
+				earliestStart = d.StartAt
+			}
 			tempQuests = append(tempQuests, quest)
 		}
 		mu.Lock()
 		quests = tempQuests
+		startTime = earliestStart
 		mu.Unlock()
 	}()
 	wg.Wait()
-	return quests, err
+	return quests, err, startTime
 }
+
 func getQuestByID(id string) (*types.Quest, error) {
 	data, _, err := db.SupabaseClient.From("quests").Select("*", "", false).Eq("id", id).Single().Execute()
 	if err != nil {
