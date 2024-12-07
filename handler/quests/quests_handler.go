@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/MultiX0/solo_leveling_system/handler/functions"
 	"github.com/MultiX0/solo_leveling_system/utils"
@@ -66,7 +65,6 @@ func (h *QuestsHandler) FetchQuests(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	playerId := params["id"]
-	log.Printf("Received request for player ID: %s", playerId)
 
 	if playerId == "" {
 		log.Println("Empty player ID received")
@@ -88,18 +86,12 @@ func (h *QuestsHandler) FetchQuests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var timeLeft time.Duration
+	var timeLeft string
 	if mainQuest != nil {
-		timeLeft = time.Until(mainStartTime.Add(24 * time.Hour))
+		timeLeft = utils.TimeLeft(mainStartTime)
 	} else if len(sideQuests) > 0 {
-		timeLeft = time.Until(sideStartTime.Add(24 * time.Hour))
+		timeLeft = utils.TimeLeft(sideStartTime)
 	}
-
-	if timeLeft < 0 {
-		timeLeft = 0
-	}
-
-	timeLeftStr := timeLeft.Round(time.Minute).String()
 
 	type Response struct {
 		MainQuest  any    `json:"main_quest"`
@@ -108,11 +100,40 @@ func (h *QuestsHandler) FetchQuests(w http.ResponseWriter, r *http.Request) {
 		Punishment string `json:"punishment"`
 	}
 
-	response := Response{
+	var response any
+
+	response = Response{
 		MainQuest:  mainQuest,
 		SideQuests: sideQuests,
-		TimeLeft:   timeLeftStr,
+		TimeLeft:   timeLeft,
 		Punishment: "You will lose 250 xp points.",
+	}
+
+	if (mainQuest == nil) && (len(sideQuests) == 0) {
+		mainT, err := functions.TimeForQuest(true, playerId)
+
+		if err != nil {
+			log.Println(err)
+			utils.WriteError(w, http.StatusBadGateway, err)
+			return
+		}
+
+		sideT, err := functions.TimeForQuest(false, playerId)
+
+		if err != nil {
+			log.Println(err)
+			utils.WriteError(w, http.StatusBadGateway, err)
+			return
+		}
+
+		nextMainQuest := utils.TimeLeft(*mainT)
+		nextSideQuests := utils.TimeLeft(*sideT)
+
+		response = map[string]string{
+			"message":          "You have finished all your tasks for today, new tasks will be released tomorrow, be prepared",
+			"next_main_quest":  nextMainQuest,
+			"next_side_quests": nextSideQuests,
+		}
 	}
 
 	utils.WriteJsonResponse(w, http.StatusOK, response)

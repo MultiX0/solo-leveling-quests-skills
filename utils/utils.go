@@ -35,3 +35,15 @@ func NowDate() string {
 	now := time.Now().UTC().Format("2006-01-02T15:04:05.999999Z")
 	return now
 }
+
+func TimeLeft(t time.Time) string {
+	timeLeft := time.Until(t.Add(24 * time.Hour))
+
+	if timeLeft < 0 {
+		timeLeft = 0
+	}
+
+	timeLeftStr := timeLeft.Round(time.Minute).String()
+
+	return timeLeftStr
+}

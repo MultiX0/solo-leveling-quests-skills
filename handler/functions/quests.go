@@ -24,7 +24,7 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 	go func() {
 		defer wg.Done()
 		completedQuestData, count, queryErr := db.SupabaseClient.From("player_quests").
-			Select("*", "exact", false).
+			Select("*", "exact", false).Order("start_at", &postgrest.OrderOpts{Ascending: false}).
 			Eq("player", id).
 			Eq("status", "1").
 			Eq("priority", "1").
@@ -54,7 +54,7 @@ func GetMainQuest(id string) (*types.Quest, error, time.Time) {
 			}
 		}
 		currentQuestsData, count, queryErr := db.SupabaseClient.From("player_quests").
-			Select("*", "exact", false).
+			Select("*", "exact", false).Order("start_at", &postgrest.OrderOpts{Ascending: false}).
 			Eq("player", id).
 			Eq("status", "0").
 			Eq("priority", "1").
@@ -329,6 +329,32 @@ func FinishQuest(playerId string, questId string) (*types.Skill, error) {
 	}
 
 	return skill, nil
+}
+
+func TimeForQuest(main bool, playerId string) (*time.Time, error) {
+
+	var data []byte
+	var err error
+
+	if main {
+		data, _, err = db.SupabaseClient.From("player_quests").Select("*", "exact", false).Eq("player", playerId).Eq("priority", "1").Order("start_at", &postgrest.OrderOpts{Ascending: false}).Execute()
+	} else {
+		data, _, err = db.SupabaseClient.From("player_quests").Select("*", "exact", false).Eq("player", playerId).Neq("priority", "1").Order("start_at", &postgrest.OrderOpts{Ascending: false}).Execute()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var quests []types.PlayerQuest
+	err = json.Unmarshal(data, &quests)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &quests[0].StartAt, nil
+
 }
 
 func UpdateOutdatedQuests() error {
