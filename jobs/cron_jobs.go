@@ -9,7 +9,7 @@ import (
 
 func InitCronJobs() {
 	c := cron.New()
-	c.AddFunc("@every 24h00m00s", QuestsJob)
+	c.AddFunc("@every 00h01m00s", QuestsJob)
 }
 
 func QuestsJob() {
