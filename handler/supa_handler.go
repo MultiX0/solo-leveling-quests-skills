@@ -40,7 +40,6 @@ func (h *SupabaseHandler) HandleRequests(router *mux.Router) {
 	router.HandleFunc("/init", h.initDB).Methods("POST")
 	router.HandleFunc("/player/{id}", h.GetPlayerByID).Methods("GET")
 	router.HandleFunc("/player", h.CreateNewPlayer).Methods("POST")
-	router.HandleFunc("/skills", h.CreateNewPlayer).Methods("GET")
 }
 
 func (h *SupabaseHandler) CreateNewPlayer(w http.ResponseWriter, r *http.Request) {
